@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Base styles for better consistency across platforms (aka. CSS reset). -->
+  <link rel="stylesheet" type="text/css" href="../normalize.css" />
+
+  <!-- Custom styles. -->
+  <link rel="stylesheet" type="text/css" href="./styles.css" />
+
+  <!-- Add empty favicon to suppress not found errors. -->
+  <link rel="icon" href="data:;" />
+
+  <!-- Allows React to be run buildless via "text/babel" script below. -->
+  <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
+    integrity="sha256-aS0B0wnsaDByLfE16h4MDCP1fQFccysd1YWOcV+gbBo=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" data-type="module">
+    import React, {
+      useState,
+      useEffect,
+    } from 'https://esm.sh/react@18?dev';
+    import { createRoot } from 'https://esm.sh/react-dom@18/client?dev';
+    import * as zebar from 'https://esm.sh/zebar@2';
+
+    const providers = zebar.createProviderGroup({
+      network: { type: 'network' },
+      glazewm: { type: 'glazewm' },
+      date: { type: 'date', locale: 'de', formatting: 'EEE d MMM HH:mm' },
+      battery: { type: 'battery' },
+      audio: { type: 'audio' },
+      media: { type: 'media' },
+    });
+
+    createRoot(document.getElementById('root')).render(<App />);
+
+    function App() {
+      const [output, setOutput] = useState(providers.outputMap);
+
+      useEffect(() => {
+        providers.onOutput(() => setOutput(providers.outputMap));
+      }, []);
+
+      const [batteryIsHovered, setBatteryIsHovered] = useState(false);
+      const [networkIsHovered, setNetworkIsHovered] = useState(false);
+      const [dateIsHovered, setDateIsHovered] = useState(false);
+
+      // Get icon to show for current network status.
+      function getNetworkIcon(networkOutput) {
+        switch (networkOutput.defaultInterface?.type) {
+          case 'ethernet':
+            return <i className="nf nf-md-ethernet_cable"></i>;
+          case 'wifi':
+            if (networkOutput.defaultGateway?.signalStrength >= 80) {
+              return <i className="nf nf-md-wifi_strength_4"></i>;
+            } else if (
+              networkOutput.defaultGateway?.signalStrength >= 65
+            ) {
+              return <i className="nf nf-md-wifi_strength_3"></i>;
+            } else if (
+              networkOutput.defaultGateway?.signalStrength >= 40
+            ) {
+              return <i className="nf nf-md-wifi_strength_2"></i>;
+            } else if (
+              networkOutput.defaultGateway?.signalStrength >= 25
+            ) {
+              return <i className="nf nf-md-wifi_strength_1"></i>;
+            } else {
+              return <i className="nf nf-md-wifi_strength_outline"></i>;
+            }
+          default:
+            return (
+              <i className="nf nf-md-wifi_strength_off_outline"></i>
+            );
+        }
+      }
+
+      // Get icon to show for how much of the battery is charged.
+      function getBatteryIcon(batteryOutput) {
+        if (batteryOutput.chargePercent > 90)
+          return <i className="nf nf-fa-battery_4"></i>;
+        if (batteryOutput.chargePercent > 70)
+          return <i className="nf nf-fa-battery_3"></i>;
+        if (batteryOutput.chargePercent > 40)
+          return <i className="nf nf-fa-battery_2"></i>;
+        if (batteryOutput.chargePercent > 20)
+          return <i className="nf nf-fa-battery_1"></i>;
+        return <i className="nf nf-fa-battery_0"></i>;
+      }
+
+      function getAudioIcon(audioOutput) {
+        if (audioOutput.defaultPlaybackDevice.volume === 0) {
+          return <i className="nf nf-md-volume_off"></i>;
+        }
+        if (audioOutput.defaultPlaybackDevice.volume > 66) {
+          return <i className="nf nf-md-volume_high"></i>;
+        }
+        if (audioOutput.defaultPlaybackDevice.volume > 33) {
+          return <i className="nf nf-md-volume_medium"></i>;
+        }
+        return <i className="nf nf-md-volume_low"></i>;
+      }
+
+      return (
+        <div className="app">
+          <div className="left">
+            {output.glazewm && (
+              <div className="workspaces">
+                {output.glazewm.currentWorkspaces.map(workspace => (
+                  <button
+                    className={`workspace ${workspace.hasFocus && 'focused'} ${workspace.isDisplayed && 'displayed'}`}
+                    onClick={() =>
+                      output.glazewm.runCommand(
+                        `focus --workspace ${workspace.name}`,
+                      )
+                    }
+                    key={workspace.name}
+                  >
+                    {workspace.displayName ?? workspace.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="center" onMouseEnter={() => setDateIsHovered(true)} onMouseLeave={() => setDateIsHovered(false)}>
+            {output.media?.currentSession === null ? (
+              <div className="date">{output.date?.formatted}</div>
+            ): (
+              <div style={{ height: '100%' }}>
+              {!dateIsHovered && (
+                <div className="date">{output.date?.formatted}</div>
+              )}
+              {dateIsHovered && (
+              <div className="media">
+                <div className="mediaInfo">
+                  <span>{output.media.currentSession.artist} - {output.media.currentSession.title}</span>
+                </div>
+                <div className="mediaControls">
+                  <i className="nf nf-md-skip_backward" onClick={() => output.media.previous()}></i>
+                  {output.media.currentSession.isPlaying ? (
+                    <i className="nf nf-md-pause" onClick={() => output.media.togglePlayPause()}></i>
+                  ) : (
+                    <i className="nf nf-md-play" onClick={() => output.media.togglePlayPause()}></i>
+                  )}
+                  <i className="nf nf-md-skip_forward" onClick={() => output.media.next()}></i>
+                </div>
+              </div>
+            )}
+              </div>
+            )}
+            {/*output.date?.formatted*/}
+          </div>
+
+          <div className="right">
+            {output.network && (
+              <div className="network" onMouseEnter={() => setNetworkIsHovered(true)} onMouseLeave={() => setNetworkIsHovered(false)}>
+                {getNetworkIcon(output.network)}
+                {!networkIsHovered && output.network.defaultGateway && (
+                  <div className="networkInfo">
+                    {output.network.defaultGateway?.ssid}
+                  </div>
+                )}
+                {networkIsHovered && output.network.defaultGateway && (
+                  <div className="networkInfo">
+                    {output.network.defaultGateway?.ipv4Addresses}
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="batteryAudio" onMouseEnter={() => setBatteryIsHovered(true)} onMouseLeave={() => setBatteryIsHovered(false)}>
+              {!batteryIsHovered && output.battery && (
+                <div className="battery">
+                  {output.battery.isCharging && (
+                    <i className="nf nf-md-power_plug charging-icon"></i>
+                  )}
+                  {getBatteryIcon(output.battery)}
+                  {Math.round(output.battery.chargePercent)}%
+                </div>
+              )}
+              {batteryIsHovered && output.audio && (
+                <div className="audio">
+                  {getAudioIcon(output.audio)}
+                  {output.audio.defaultPlaybackDevice.volume}%
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+      );
+    }
+  </script>
+</body>
+
+</html>

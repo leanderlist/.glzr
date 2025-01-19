@@ -1,0 +1,181 @@
+/**
+ * Import the Nerdfonts icon font.
+ * Ref https://www.nerdfonts.com/cheat-sheet for a cheatsheet of available Nerdfonts icons.
+ */
+@import 'https://www.nerdfonts.com/assets/css/webfont.css';
+
+i {
+  color: rgb(115 130 175 / 95%);
+  margin-right: 7px;
+}
+
+body {
+  color: rgb(255 255 255 / 90%);
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  overflow: hidden;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+#root {
+  /*background: linear-gradient(rgb(0 0 0 / 90%), rgb(5 2 20 / 85%));*/
+  background: rgb(55 51 86 / 50%);
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  height: 100%;
+  /* padding: 4px 1.5vw; */
+  padding: 0px 0vw;
+}
+
+.left,
+.center,
+.right {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.center {
+  justify-self: center;
+  padding: 0px 20px;
+  height: 100%;
+}
+
+.left {
+  width: fit-content;
+  padding: 0px 10px;
+  border-bottom: 1px solid rgb(255 255 255 / 100%);
+  /*padding: 4px 1px 4px 5px;*/
+}
+
+.right {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo,
+.binding-mode,
+.tiling-direction,
+.network,
+.memory,
+.cpu,
+.battery,
+.audio,
+.media,
+.date {
+  display: flex;
+  align-items: center;
+  padding: 0px 10px;
+  height: 100%;
+  border-bottom: 1px solid rgb(255 255 255 / 100%);
+  transition: border-bottom-width 0.3s ease-in-out; 
+}
+
+.battery,
+.audio {
+  margin-left: 10px;
+}
+
+.network {
+  margin-right: 10px;
+}
+
+.media {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Abstand zwischen den Elementen */
+}
+
+.mediaInfo {
+  display: flex;
+  align-items: center;
+}
+
+.mediaControls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mediaControls i {
+  cursor: pointer;
+  color: rgb(255 255 255 / 90%);
+}
+.mediaControls i:hover {
+  color: rgb(134 163 195 / 90%)
+}
+
+.batteryAudio {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  cursor: pointer;
+}
+
+.workspaces {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.workspace {
+  background: /*rgb(255 255 255 / 5%)*/ rgb(69 78 114 / 80%);
+  margin-right: 4px;
+  padding: 4px 8px;
+  color: rgb(255 255 255 / 90%);
+  border: none;
+  border-radius: 2px;
+  border: 1px solid rgb(138 167 199 / 15%);
+  cursor: pointer;
+
+  &.displayed {
+    /*background: rgb(255 255 255 / 15%);*/
+    background: rgb(138 167 199 / 15%);
+  }
+
+  &.focused,
+  &:hover {
+    background: /*rgb(75 115 255 / 50%)*/ rgb(130, 150, 183);
+  }
+}
+
+.binding-mode,
+.tiling-direction {
+  background: rgb(255 255 255 / 15%);
+  color: rgb(255 255 255 / 90%);
+  border-radius: 2px;
+  line-height: 1;
+  padding: 4px 8px;
+  border: 0;
+  cursor: pointer;
+}
+
+.binding-mode {
+  margin-right: 4px;
+}
+
+.cpu .high-usage {
+  color: #900029;
+}
+
+.battery {
+  position: relative;
+}
+
+.battery .charging-icon {
+  position: absolute;
+  font-size: 7px;
+  left: -8px;
+  top: 3px;
+}
