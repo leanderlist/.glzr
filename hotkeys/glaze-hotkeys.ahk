@@ -1,7 +1,9 @@
 ﻿#Requires AutoHotkey v2.0
 
+userprofile := EnvGet("userprofile")
+
 browser := "zen.exe"
-music := "C:\Users\listl\AppData\Roaming\Spotify\Spotify.exe"
+music := userprofile "\AppData\Roaming\Spotify\Spotify.exe"
 
 
 ; (Alt+B) Open Browser
@@ -18,11 +20,3 @@ music := "C:\Users\listl\AppData\Roaming\Spotify\Spotify.exe"
 !m:: {
 	Run music
 }
-
-+!i:: {
-	Run '"cmd.exe" "/c" "start" "" "C:\Users\listl\Pictures\medt\IMG_5821.JPG"'
-}
-
-
-
-
